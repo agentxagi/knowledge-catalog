@@ -81,6 +81,10 @@ def build_graph(entries: list[dict]) -> dict:
         eid = entry["id"]
         links = entry.get("links", {})
         
+        # Handle links that are list instead of dict (malformed)
+        if isinstance(links, list):
+            continue
+        
         for link_type, link_list in links.items():
             if not isinstance(link_list, list):
                 link_list = [link_list]
@@ -139,6 +143,14 @@ def print_org_tree(entries: list[dict], graph: dict):
         if eid not in everyone_with_manager and eid not in managers_set:
             roots.append(eid)
     
+    # Deduplicate roots while preserving order
+    seen = set()
+    deduped_roots = []
+    for r in roots:
+        if r not in seen:
+            seen.add(r)
+            deduped_roots.append(r)
+    
     def get_display(eid):
         for e in entries:
             if e["id"] == eid:
@@ -157,7 +169,7 @@ def print_org_tree(entries: list[dict], graph: dict):
             print_tree(child, indent + 1, i == len(children) - 1)
     
     print("\n🌳 Valor Digital — Organograma\n")
-    for root in roots:
+    for root in deduped_roots:
         print_tree(root)
 
 
@@ -229,6 +241,8 @@ def validate(entries: list[dict], graph: dict, manifest: dict) -> bool:
         
         # Check link targets exist
         links = entry.get("links", {})
+        if isinstance(links, list):
+            links = {}
         for link_type, link_list in links.items():
             if not isinstance(link_list, list):
                 link_list = [link_list]
@@ -359,7 +373,7 @@ def ingest_to_valorbrain(entries: list[dict], manifest: dict):
             "collection": collection,
             "path": f"org-catalog/{entry.get('type','unknown')}/{eid}",
             "title": f"[{entry.get('type','?').upper()}] {title}",
-            "body": body,
+            "content": body,
         }
         
         try:

@@ -30,7 +30,7 @@ contacts:
   escalation: val-tech-lead
 links:
   reports_to: [{target: val-tech-lead}]
-  contributes_to: [{target: adrs}]
+  contributes_to: [{target: adr-001-multica-task-store}]
 ---
 
 # Dante "Dan" Almeida — Full-Stack Developer
