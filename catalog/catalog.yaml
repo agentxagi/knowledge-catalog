@@ -1,0 +1,92 @@
+# Valor Digital — Organization Catalog
+# Metadata as Code format, adapted from GCP knowledge-catalog concepts.
+# This manifest declares the schema of our organizational knowledge graph.
+
+scope: valor-digital.organization-catalog
+
+# Entry types — the kinds of entities in our org
+entryTypes:
+  persona:
+    description: "AI agent acting as an employee with a specific role"
+    requiredAspects: [identity, responsibilities]
+  playbook:
+    description: "Documented process or procedure"
+    requiredAspects: [overview, steps]
+  client:
+    description: "Customer/client profile"
+    requiredAspects: [overview, contacts]
+  adr:
+    description: "Architecture Decision Record"
+    requiredAspects: [decision]
+  runbook:
+    description: "Operational runbook for incidents and maintenance"
+    requiredAspects: [overview, steps]
+  tool:
+    description: "Technical tool or service reference"
+    requiredAspects: [overview]
+
+# Aspect types — structured metadata fields on entries
+aspectTypes:
+  identity:
+    fields: [nome, apelido, personalidade, tom]
+  responsibilities:
+    type: list
+  contacts:
+    fields: [hermes_profile, escalation, multica_squad]
+  metrics:
+    type: list
+  decision:
+    fields: [context, decision, consequences, status]
+  overview:
+    type: markdown
+  steps:
+    type: list
+  valorbrain:
+    fields: [read_collections, write_collections, level]
+
+# Link types — typed relationships between entries
+linkTypes:
+  reports_to:
+    description: "Hierarchical reporting relationship"
+    domain: persona
+    range: persona
+  manages:
+    description: "Direct management of another persona"
+    domain: persona
+    range: persona
+  owns:
+    description: "Ownership of a playbook, client, or process"
+    domain: persona
+    range: [playbook, client, adr]
+  contributes_to:
+    description: "Participation in a process or team"
+    domain: persona
+    range: [playbook, adr]
+  client_of:
+    description: "Account team assignment for a client"
+    domain: persona
+    range: client
+  depends_on:
+    description: "Technical or operational dependency"
+    domain: [persona, tool, runbook]
+    range: [tool, persona]
+  successor_of:
+    description: "ADR supersedes a previous decision"
+    domain: adr
+    range: adr
+  handoff_to:
+    description: "Formal handoff protocol between teams"
+    domain: persona
+    range: persona
+
+# Snapshot — what exists in this catalog
+snapshot:
+  entries: [persona, playbook, client, adr, runbook, tool]
+  aspects: [identity, responsibilities, contacts, metrics, decision, overview, steps, valorbrain]
+  entryLinks: [reports_to, manages, owns, contributes_to, client_of, depends_on, successor_of, handoff_to]
+
+# Publishing — what gets ingested into ValorBrain
+publishing:
+  entries: [persona, playbook, client, adr, runbook, tool]
+  aspects: [identity, responsibilities, contacts, metrics, decision, overview, steps, valorbrain]
+  entryLinks: [reports_to, manages, owns, contributes_to, client_of, depends_on, successor_of, handoff_to]
